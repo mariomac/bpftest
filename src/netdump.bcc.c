@@ -4,6 +4,7 @@
 #include <linux/if_ether.h>
 #include <linux/ip.h>
 #include <linux/udp.h>
+#include <linux/tcp.h>
 
 struct ip_event
 {
@@ -11,6 +12,8 @@ struct ip_event
     uint32_t daddr;
     uint8_t protocol;
     uint16_t length;
+    uint16_t sport;
+    uint16_t dport;
 } __attribute__((packed));
 
 BPF_PERF_OUTPUT(ip_events);
@@ -31,26 +34,34 @@ int inspect_network(struct xdp_md *ctx)
             ipe.saddr = htonl(ip->saddr);
             ipe.daddr = htonl(ip->daddr);
             ipe.protocol = ip->protocol;
-            ipe.length = ip->tot_len;
 
-            ip_events.perf_submit(ctx, &ipe, sizeof(ipe));
-
-            /*
-            if (ip->protocol == IPPROTO_UDP)
+            switch (ip->protocol)
             {
-
+            case IPPROTO_TCP:
+            {
+                struct tcphdr *tcp = (void *)ip + sizeof(*ip);
+                if ((void *)tcp + sizeof(*tcp) <= data_end)
+                {
+                    ipe.sport = htons(tcp->source);
+                    ipe.dport = htons(tcp->dest);
+                }
+            }
+            break;
+            case IPPROTO_UDP:
+            {
                 struct udphdr *udp = (void *)ip + sizeof(*ip);
                 if ((void *)udp + sizeof(*udp) <= data_end)
                 {
-                    struct udphdr *udp = (void *)ip + sizeof(*ip);
-                    if ((void *)udp + sizeof(*udp) <= data_end)
-                    {
-                        u64 value = htons(udp->dest);
-                        counter.increment(value);
-                    }
+                    ipe.sport = htons(udp->source);
+                    ipe.dport = htons(udp->dest);
                 }
             }
-            */
+            break;
+            default:
+                break;
+            }
+
+            ip_events.perf_submit(ctx, &ipe, sizeof(ipe));
         }
     }
     return XDP_PASS;

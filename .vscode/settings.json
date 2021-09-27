@@ -7,6 +7,7 @@
         "__string": "c",
         "algorithm": "c",
         "functional": "c",
-        "unordered_map": "c"
+        "unordered_map": "c",
+        "tcp.h": "c"
     }
 }

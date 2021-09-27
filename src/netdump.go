@@ -25,7 +25,8 @@ type IpEvent struct {
 	SAddr    uint32
 	DAddr    uint32
 	Protocol uint8
-	Length   uint16
+	SPort    uint16
+	DPort    uint16
 }
 
 const device = "eth0"
@@ -65,8 +66,10 @@ func main() {
 				fmt.Printf("failed to decode received data: %s\n", err)
 				continue
 			}
-			fmt.Printf("%s: %s --> %s (%d bytes)\n",
-				protocol(event.Protocol), int2ip(event.SAddr), int2ip(event.DAddr), event.Length)
+			fmt.Printf("%s: %s:%d --> %s:%d\n",
+				protocol(event.Protocol),
+				int2ip(event.SAddr), event.SPort,
+				int2ip(event.DAddr), event.DPort)
 		}
 	}()
 
