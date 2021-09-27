@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "udp.h": "c",
+        "skbuff.h": "c",
+        "inet_sock.h": "c",
+        "netdevice.h": "c",
+        "__string": "c",
+        "algorithm": "c",
+        "functional": "c",
+        "unordered_map": "c"
+    }
+}

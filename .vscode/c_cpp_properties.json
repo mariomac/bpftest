@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}",
+                "/Users/mmaciasl/Desktop/linux-4.18.20/include",
+                "/Users/mmaciasl/Desktop/linux-4.18.20/include/uapi",
+                "/Users/mmaciasl/Desktop/linux-4.18.20/include/generated",
+                "/Users/mmaciasl/Desktop/linux-4.18.20/arch/x86/include",
+                "/Users/mmaciasl/Desktop/linux-4.18.20/arch/x86/include/uapi",
+                "/Users/mmaciasl/Desktop/linux-4.18.20/arch/x86/include/generated"
+            ],
+            "defines": [
+                "__KERNEL__"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "/Users/mmaciasl/Desktop/linux-4.18.20/include",
+                    "/Users/mmaciasl/Desktop/linux-4.18.20/mm",
+                    "/Users/mmaciasl/Desktop/linux-4.18.20/fs",
+                    "/Users/mmaciasl/Desktop/linux-4.18.20/kernel"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c89",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
