@@ -1,16 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
+	"unsafe"
 
-	bpf "github.com/iovisor/gobpf/bcc"
+	"github.com/iovisor/gobpf/elf"
 )
 
 /*
@@ -30,38 +29,39 @@ type IpEvent struct {
 }
 
 const device = "eth0"
+const xdpProgram = "inspect_network"
+const mapName = "ip_events"
 
 func main() {
-	// TODO: use CO-RE to avoid recompiling each execution
-	file, err := ioutil.ReadFile("./netdump.bcc.c")
-	panicOnErr(err)
-
-	m := bpf.NewModule(string(file), []string{})
+	m := elf.NewModule("netdump.elf") //bpf.NewModule(string(file), []string{})
 	defer m.Close()
 
-	fn, err := m.Load("inspect_network", C.BPF_PROG_TYPE_XDP, 1, 65536)
+	err := m.Load(map[string]elf.SectionParams{
+		mapName: {
+			PinPath: xdpProgram,
+		},
+	})
 	panicOnErr(err)
 
 	// TODO: select all devices with a deny list
-	panicOnErr(m.AttachXDP(device, fn))
+	panicOnErr(m.AttachXDP(device, xdpProgram))
 	defer func() {
 		panicOnErr(m.RemoveXDP(device))
 	}()
 
-	table := bpf.NewTable(m.TableId("ip_events"), m)
-
 	channel := make(chan []byte)
-
-	perfMap, err := bpf.InitPerfMap(table, channel, nil)
+	perfMap, err := elf.InitPerfMap(m, mapName, channel, nil)
 	panicOnErr(err)
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, os.Kill)
 
 	go func() {
-		for data := range channel {
+		ipEvents := m.Map(mapName)
+		noId := 0
+		for {
 			var event IpEvent
-			err := binary.Read(bytes.NewBuffer(data), binary.LittleEndian, &event)
+			err := m.LookupElement(ipEvents, unsafe.Pointer(&noId), unsafe.Pointer(&event))
 			if err != nil {
 				fmt.Printf("failed to decode received data: %s\n", err)
 				continue
@@ -73,9 +73,9 @@ func main() {
 		}
 	}()
 
-	perfMap.Start()
+	perfMap.PollStart()
 	<-sig
-	perfMap.Stop()
+	perfMap.PollStop()
 }
 
 func panicOnErr(err error) {
