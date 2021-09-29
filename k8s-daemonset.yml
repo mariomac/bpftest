@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: netdump
+  labels:
+    app: netdump
 spec:
   selector:
     matchLabels:
@@ -10,6 +12,7 @@ spec:
     metadata:
       labels:
         name: netdump
+        app: netdump
     spec:
       hostNetwork: true
       containers:
@@ -17,3 +20,13 @@ spec:
           image: quay.io/mmaciasl/netdump:latest
           securityContext:
             privileged: true
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: libmodules
+          env:
+            - name: DEVICE
+              value: ovn-k8s-mp0
+      volumes:
+        - name: libmodules
+          hostPath:
+            path: "/lib/modules"

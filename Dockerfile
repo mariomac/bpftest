@@ -4,7 +4,6 @@ RUN yum -y install epel-release
 RUN yum update -y
 RUN yum groupinstall -y "Development tools"
 RUN yum install -y elfutils-libelf-devel cmake3 git bison flex ncurses-devel golang iperf3 netperf
-RUN yum install -y golang
 RUN yum install -y llvm-toolset llvm-devel llvm-static clang-devel
 RUN yum install -y python3-netaddr python3-pyroute2 python3
 RUN ln -s /usr/bin/python3.6 /usr/bin/python
@@ -27,5 +26,7 @@ WORKDIR /
 # TODO Clean other unneeded yum packages
 RUN rm -rf /code
 RUN rm -rf /bcc
+RUN yum clean all
+RUN rm -rf /var/cache/dnf
 
 CMD ["/netdump"]

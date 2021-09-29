@@ -29,9 +29,15 @@ type IpEvent struct {
 	DPort    uint16
 }
 
-const device = "eth0"
+const defaultDevice = "eth0"
 
 func main() {
+
+	device := os.Getenv("DEVICE")
+	if device == "" {
+		device = defaultDevice
+	}
+
 	// TODO: use CO-RE to avoid recompiling each execution
 	file, err := ioutil.ReadFile("./netdump.bcc.c")
 	panicOnErr(err)

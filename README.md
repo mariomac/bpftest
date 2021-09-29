@@ -3,7 +3,7 @@
 To build it:
 
 ```
-docker build . --tag=bpftest:latest
+docker build . --tag=quay.io/mmaciasl/netdump:latest
 ```
 
 This works on Centos8:
