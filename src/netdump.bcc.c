@@ -11,7 +11,6 @@ struct ip_event
     uint32_t saddr;
     uint32_t daddr;
     uint8_t protocol;
-    uint16_t length;
     uint16_t sport;
     uint16_t dport;
 } __attribute__((packed));

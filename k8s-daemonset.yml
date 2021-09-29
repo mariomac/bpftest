@@ -18,6 +18,7 @@ spec:
       containers:
         - name: bpftest
           image: quay.io/mmaciasl/netdump:latest
+          imagePullPolicy: Always
           securityContext:
             privileged: true
           volumeMounts:
@@ -25,7 +26,8 @@ spec:
               name: libmodules
           env:
             - name: DEVICE
-              value: ovn-k8s-mp0
+              value: tun0
+#              value: ovn-k8s-mp0
       volumes:
         - name: libmodules
           hostPath:
