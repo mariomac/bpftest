@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: netdump
+spec:
+  selector:
+    matchLabels:
+      name: netdump
+  template:
+    metadata:
+      labels:
+        name: netdump
+    spec:
+      hostNetwork: true
+      containers:
+        - name: bpftest
+          image: quay.io/mmaciasl/netdump:latest
+          securityContext:
+            privileged: true
