@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: netdump
+  labels:
+    app: netdump
+spec:
+  selector:
+    matchLabels:
+      name: netdump
+  template:
+    metadata:
+      labels:
+        name: netdump
+        app: netdump
+    spec:
+      hostNetwork: true
+      containers:
+        - name: bpftest
+          image: quay.io/mmaciasl/xdp-test:latest
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: libmodules
+          env:
+            - name: DEVICE
+#              value: tun0
+              value: ovn-k8s-mp0
+      volumes:
+        - name: libmodules
+          hostPath:
+            path: "/lib/modules"
