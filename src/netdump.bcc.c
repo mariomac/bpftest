@@ -19,7 +19,6 @@ BPF_PERF_OUTPUT(ip_events);
 
 int inspect_network(struct xdp_md *ctx)
 {
-    bpf_trace_printk("packet received\n");
     void *data = (void *)(long)ctx->data;
     void *data_end = (void *)(long)ctx->data_end;
     struct ethhdr *eth = data;
