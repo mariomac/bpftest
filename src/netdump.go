@@ -29,8 +29,8 @@ type IpEvent struct {
 }
 
 const defaultDevice = "eth0"
-const xdpProgram = "inspect_network"
-const mapName = "ip_events"
+const xdpProgram = "xdp/inspect_network"
+const mapName = "maps/ip_events"
 
 func main() {
 	device := os.Getenv("DEVICE")
@@ -42,7 +42,7 @@ func main() {
 
 	err := m.Load(map[string]elf.SectionParams{
 		mapName: {
-			PinPath: xdpProgram,
+			PinPath:                    xdpProgram,
 		},
 	})
 	panicOnErr(err)

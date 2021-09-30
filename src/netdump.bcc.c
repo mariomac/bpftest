@@ -1,6 +1,6 @@
-#define KBUILD_MODNAME "netdump"
-
+#include <linux/version.h>
 #include <linux/bpf.h>
+#include "bpf_helpers.h"
 #include <linux/if_ether.h>
 #include <linux/ip.h>
 #include <linux/udp.h>
@@ -10,20 +10,26 @@
 
 #define PERF_MAX_STACK_DEPTH 127
 
+#define IPPROTO_TCP 6
+#define IPPROTO_UDP 17
+
 struct ip_event
 {
-    uint32_t saddr;
-    uint32_t daddr;
-    uint8_t protocol;
-    uint16_t sport;
-    uint16_t dport;
+    __u32 saddr;
+    __u32 daddr;
+    __u8 protocol;
+    __u16 length;
+    __u16 sport;
+    __u16 dport;
 } __attribute__((packed));
 
 struct bpf_map_def SEC("maps/ip_events") ip_events = {
-    .type = BPF_MAP_TYPE_QUEUE,
-    .key_size = 0,
+    .type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,
+    .key_size = sizeof(int),
     .value_size = sizeof(struct ip_event),
     .max_entries = 1024,
+    .pinning = 0,
+    .namespace = "",
 };
 
 SEC("xdp/inspect_network")
@@ -39,8 +45,8 @@ int inspect_network(struct xdp_md *ctx)
         if ((void *)ip + sizeof(*ip) <= data_end)
         {
             struct ip_event ipe;
-            ipe.saddr = htonl(ip->saddr);
-            ipe.daddr = htonl(ip->daddr);
+            ipe.saddr = ip->saddr;
+            ipe.daddr = ip->daddr;
             ipe.protocol = ip->protocol;
 
             switch (ip->protocol)
@@ -50,8 +56,8 @@ int inspect_network(struct xdp_md *ctx)
                 struct tcphdr *tcp = (void *)ip + sizeof(*ip);
                 if ((void *)tcp + sizeof(*tcp) <= data_end)
                 {
-                    ipe.sport = htons(tcp->source);
-                    ipe.dport = htons(tcp->dest);
+                    ipe.sport = tcp->source;
+                    ipe.dport = tcp->dest;
                 }
             }
             break;
@@ -60,8 +66,8 @@ int inspect_network(struct xdp_md *ctx)
                 struct udphdr *udp = (void *)ip + sizeof(*ip);
                 if ((void *)udp + sizeof(*udp) <= data_end)
                 {
-                    ipe.sport = htons(udp->source);
-                    ipe.dport = htons(udp->dest);
+                    ipe.sport = udp->source;
+                    ipe.dport = udp->dest;
                 }
             }
             break;
@@ -74,3 +80,5 @@ int inspect_network(struct xdp_md *ctx)
     }
     return XDP_PASS;
 }
+
+char _license[] SEC("license") = "GPL";
