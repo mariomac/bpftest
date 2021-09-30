@@ -8,12 +8,6 @@
         "algorithm": "c",
         "functional": "c",
         "unordered_map": "c",
-        "tcp.h": "c",
-        "types.h": "c",
-        "byteorder.h": "c",
-        "little_endian.h": "c",
-        "ip.h": "c",
-        "int-ll64.h": "c",
-        "bpf.h": "c"
+        "tcp.h": "c"
     }
 }
