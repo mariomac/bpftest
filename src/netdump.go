@@ -28,11 +28,15 @@ type IpEvent struct {
 	DPort    uint16
 }
 
-const device = "eth0"
+const defaultDevice = "eth0"
 const xdpProgram = "inspect_network"
 const mapName = "ip_events"
 
 func main() {
+	device := os.Getenv("DEVICE")
+	if device == "" {
+		device = defaultDevice
+	}
 	m := elf.NewModule("netdump.elf") //bpf.NewModule(string(file), []string{})
 	defer m.Close()
 
