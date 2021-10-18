@@ -1,0 +1,20 @@
+#include <linux/skbuff.h>
+#include <linux/netdevice.h>
+#include <net/sock.h>
+#include <net/inet_sock.h>
+
+tracepoint:net:net_dev_queue {
+    $buff = ((struct sk_buff*)args->skbaddr);
+    $sock = (struct inet_sock*)(((struct sk_buff*)args->skbaddr)->sk);
+    if ($sock->inet_rcv_saddr != 0) {
+        printf("comm:%s tsamp:%ld dev:%s protocol:%d %s:%d -> %s:%d \n",
+            comm,
+            $buff->tstamp,
+            ((struct net_device*) $buff->dev)->name,
+            $buff->protocol,
+            ntop($sock->inet_rcv_saddr),
+            $sock->inet_sport,
+            ntop($sock->inet_daddr),
+            $sock->inet_dport);
+    }
+}

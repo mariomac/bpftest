@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bpf-scratch-pod
+  labels:
+    app: bpf-scratch-pod
+spec:
+  hostNetwork: true
+  containers:
+    - name: bpftest
+      image: quay.io/mmaciasl/bpftrace:latest
+      command:
+        - sleep
+        - 24h
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: libmodules
+          mountPath: /lib/modules
+          readOnly: true
+        - name: kerneldebug
+          mountPath: /sys/kernel/debug
+          readOnly: true
+  volumes:
+    - name: libmodules
+      hostPath:
+        path: /lib/modules
+    - name: kerneldebug
+      hostPath:
+        path: /sys/kernel/debug

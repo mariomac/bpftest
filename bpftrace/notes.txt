@@ -1,0 +1,9 @@
+
+
+
+fields documentation from:
+https://github.com/torvalds/linux/blob/fc0c0548c1a2e676d3a928aaed70f2d4d254e395/include/linux/skbuff.h#L615
+https://github.com/torvalds/linux/blob/fc0c0548c1a2e676d3a928aaed70f2d4d254e395/include/linux/netdevice.h#L1949
+https://github.com/torvalds/linux/blob/fc0c0548c1a2e676d3a928aaed70f2d4d254e395/include/net/inet_sock.h
+
+to search for more events in https://github.com/torvalds/linux/blob/9f42f674a89200d4f465a7db6070e079f3c6145f/include/trace/events/net.h
